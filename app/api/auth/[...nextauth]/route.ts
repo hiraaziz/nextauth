@@ -21,7 +21,7 @@ const handler = NextAuth({
         if (!credentials?.email || !credentials.password) {
           return null;
         }
-        const res = await fetch("http://localhost:3000/api/login", {
+        const res = await fetch("https://nextauth-six.vercel.app/api/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
