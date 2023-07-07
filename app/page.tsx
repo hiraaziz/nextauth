@@ -46,6 +46,7 @@ export default function Home() {
       ) : (
         <button onClick={() => signIn()}>Sign in</button>
       )}
+      <br />
       <Link href="/register">Register</Link>
       {session && session.user?.name}
       <br />
