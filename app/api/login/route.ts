@@ -26,6 +26,6 @@ export async function POST(request: Request) {
     ...userWithoutpassword,
     accesstoken,
   };
-  console.log("Results : ", result);
+
   return new Response(JSON.stringify(result));
 }
