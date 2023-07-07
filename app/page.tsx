@@ -46,6 +46,7 @@ export default function Home() {
       ) : (
         <button onClick={() => signIn()}>Sign in</button>
       )}
+      <Link href="/login">Register</Link>
       {session && session.user?.name}
       <br />
       <button onClick={() => getTokenverify()}>Dashboard (Restricted)</button>
