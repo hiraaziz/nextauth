@@ -2,7 +2,6 @@ import { signJwtAccessToken } from "@/lib/jwt";
 import { db, authTable } from "@/lib/drizzle";
 import { eq } from "drizzle-orm";
 import { compare } from "bcryptjs";
-import { cookies } from "next/headers";
 
 interface RequestBody {
   email: string;
@@ -22,11 +21,11 @@ export async function POST(request: Request) {
   }
   const { password, ...userWithoutpassword } = body;
   const accesstoken = signJwtAccessToken(userWithoutpassword);
-  cookies().set("accesstoken", accesstoken);
 
   const result = {
     ...userWithoutpassword,
     accesstoken,
   };
+  console.log("Results : ", result);
   return new Response(JSON.stringify(result));
 }
