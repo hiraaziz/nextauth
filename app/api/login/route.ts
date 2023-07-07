@@ -1,22 +1,32 @@
 import { signJwtAccessToken } from "@/lib/jwt";
+import { db, authTable } from "@/lib/drizzle";
+import { eq } from "drizzle-orm";
+import { compare } from "bcryptjs";
+import { cookies } from "next/headers";
 
 interface RequestBody {
-  username: string;
+  email: string;
   password: string;
 }
 
 export async function POST(request: Request) {
   const body: RequestBody = await request.json();
 
-  if (body && body.password === body.password) {
-    const { password, ...userWithoutpassword } = body;
-    console.log("user : ---------", userWithoutpassword);
-    const accesstoken = signJwtAccessToken(userWithoutpassword);
+  const user = await db
+    .select()
+    .from(authTable)
+    .where(eq(authTable.email, body.email));
 
-    const result = {
-      ...userWithoutpassword,
-      accesstoken,
-    };
-    return new Response(JSON.stringify(result));
-  } else return new Response(JSON.stringify(null));
+  if (!user[0] || !(await compare(body.password, user[0].password))) {
+    return new Response(JSON.stringify(null));
+  }
+  const { password, ...userWithoutpassword } = body;
+  const accesstoken = signJwtAccessToken(userWithoutpassword);
+  cookies().set("accesstoken", accesstoken);
+
+  const result = {
+    ...userWithoutpassword,
+    accesstoken,
+  };
+  return new Response(JSON.stringify(result));
 }

@@ -1,8 +1,6 @@
 import { verifyJwt } from "@/lib/jwt";
-import jwt from "jsonwebtoken";
-import { getToken } from "next-auth/jwt";
 
-export async function POST(request: Request, res: Response) {
+export async function GET(request: Request, res: Response) {
   const accessToken = request.headers
     .get("authorization")
     ?.replace("Bearer ", "");
@@ -10,7 +8,8 @@ export async function POST(request: Request, res: Response) {
   try {
     if (accessToken) {
       const decodedToken = verifyJwt(accessToken);
-
+      if (!decodedToken)
+        return new Response(JSON.stringify(false), { status: 400 });
       console.log("Decoded token:", decodedToken);
     }
     return new Response(JSON.stringify(true));

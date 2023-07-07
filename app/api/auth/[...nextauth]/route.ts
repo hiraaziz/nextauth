@@ -3,21 +3,31 @@ import { signJwtAccessToken } from "@/lib/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const handler = NextAuth({
+  pages: {
+    signIn: "/login",
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "example@example.com",
+        },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
+        if (!credentials?.email || !credentials.password) {
+          return null;
+        }
         const res = await fetch("http://localhost:3000/api/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: credentials?.username,
+            email: credentials?.email,
             password: credentials?.password,
           }),
         });
@@ -42,7 +52,7 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       session.user = token as any;
-      console.log("Token  : ", token);
+
       return session;
     },
   },
