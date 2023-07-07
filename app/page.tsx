@@ -2,41 +2,26 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { cookies } from "next/headers";
 
-type sessiontype = {
-  user: {
-    email: string;
-    accesstoken: string;
-    iat: number;
-    exp: number;
-    jti: string;
-  };
-  expires: string;
-};
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
   console.log("session : ", session);
-  console.log("status : ", status);
-
-  let sessionData: sessiontype | null;
-  useEffect(() => {
-    sessionData = session as sessiontype;
-  }, []);
 
   async function getTokenverify() {
-    const res = await fetch("/api/getuser", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${sessionData?.user?.accesstoken}`,
-      },
-    });
-    console.log("Response from button click  : ", res);
-    if (res.status === 200) {
-      router.push("/dashboard");
+    if (!session?.user?.accesstoken) console.log("unauthorize request");
+    else {
+      const res = await fetch("/api/getuser", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.user?.accesstoken}`,
+        },
+      });
+      console.log("Response from button click  : ", res);
+      if (res.status === 200) {
+        router.push("/dashboard");
+      }
     }
   }
   return (
@@ -48,7 +33,8 @@ export default function Home() {
       )}
       <br />
       <Link href="/register">Register</Link>
-      {session && session.user?.name}
+      <br />
+      <h1>Email : {session && session.user?.email}</h1>
       <br />
       <button onClick={() => getTokenverify()}>Dashboard (Restricted)</button>
     </div>
